@@ -185,7 +185,7 @@ function Description({ desc }) {
 function Title({ server_ip }) {
     return (
         <div className="flex flex-row p-2 bg-gray-300 dark:bg-gray-700 lg:bg-inherit lg:flex-col lg:pt-8">
-            <div className="text-xl font-bold w-auto lg:self-center lg:text-3xl lg:pb-2">BitcoinHD chain</div>
+            <div className="text-xl font-bold w-auto lg:self-center lg:text-3xl lg:pb-2">DePINC chain</div>
             <div className="text-xs text-right grow self-center">
                 <span className="font-bold">Timelord service</span> <span className="underline">{server_ip}</span>
             </div>
@@ -273,8 +273,8 @@ function StatusLastBlockInfo({ hash, height, address, reward, accumulate, filter
             <StatusEntry name="Hash" value={shortHashString(hash)} />
             <StatusEntry name="Height" value={formatNumberString(height)} />
             <StatusEntry name="Miner" value={address} />
-            <StatusEntry name="Reward" value={replaceUndefined(reward) + ' BHD'} />
-            <StatusEntry name="Accumulate" value={formatNumberString(accumulate) + ' BHD'} />
+            <StatusEntry name="Reward" value={replaceUndefined(reward) + ' DEPC'} />
+            <StatusEntry name="Accumulate" value={formatNumberString(accumulate) + ' DEPC'} />
             <StatusEntry name="Filter-bit" value={filter_bits} />
             <StatusEntry name="VDF speed" value={formatNumberString(vdf_speed)} />
             <StatusEntry name="VDF time" value={vdf_time} />
@@ -508,7 +508,7 @@ function Rank({ rank, title }) {
                         <StatusEntry name="Farmer public-key" strong_value value={shortHashString(entry.farmer_pk)} hi={i % 2 === 0} />
                         <StatusEntry name="Produced blocks" value={formatNumberString(entry.count)} hi={i % 2 === 0} />
                         <StatusEntry name="Avg. Block Difficulty" value={formatNumberString(entry.average_difficulty)} hi={i % 2 === 0} />
-                        <StatusEntry name="Rewards" value={formatNumberString(entry.total_reward) + ' BHD'} hi={i % 2 === 0} />
+                        <StatusEntry name="Rewards" value={formatNumberString(entry.total_reward) + ' DEPC'} hi={i % 2 === 0} />
                     </div>
                 );
             })}

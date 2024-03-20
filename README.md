@@ -1,6 +1,6 @@
 ## Timelord Monitor
 
-Timelord monitor provides a web GUI allows user check the status of the timelord service, also it will provide the basic statistics of BitcoinHD1 block-chain.
+Timelord monitor provides a web GUI allows user check the status of the timelord service, also it will provide the basic statistics of DePINC block-chain.
 
 ## How to run it?
 
@@ -8,7 +8,7 @@ Timelord monitor is developed by using React/Next framework. In order to run the
 
 After the nodejs is installed on your system, please follow the instructions below:
 
-1. Clone the repo to your local computer: `git clone https://github.com/bhdone/timelord-monitor`
+1. Clone the repo to your local computer: `git clone https://github.com/depinc/timelord-monitor`
 2. Change the dir to the project root: `cd timelord-monitor`
 3. Install required packages: `npm i`
 4. Modify `next.config.js` under the project root, change the entry `apiUrl` to the prefix url you have already setup for your timelord service
