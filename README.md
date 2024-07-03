@@ -16,3 +16,9 @@ After the nodejs is installed on your system, please follow the instructions bel
 6. Run: `npm run start`
 
 Timelord monitor will listen to `127.0.0.1:3000`.
+
+## Development notes
+
+Fix the return value from function `getApiHost` if the timelord is not running locally.
+
+Run: `npm run dev` to start the website in development mode.
