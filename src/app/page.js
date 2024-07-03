@@ -137,8 +137,8 @@ function useRank(hours) {
 
 function useAccumulatedBlocks() {
     const [fullMortgageInfo, setFullMortgageInfo] = useState();
-    const queryFullMortgageInfo = () => {
-        axios.get(getApiHost() + '/api/accumulated').then(function (res) {
+    const queryFullMortgageInfo = (skip, count) => {
+        axios.get(getApiHost() + '/api/accumulated?skip=' + skip + '&count=' + count).then(function (res) {
             setFullMortgageInfo(res.data);
         });
     };
@@ -502,15 +502,35 @@ function Summary({ num_blocks, high_height, low_height, hours, summary, avg_dura
     );
 }
 
-function FullMortgageBlocks({ fullMortgageInfo }) {
-    if (!fullMortgageInfo) {
+function FullMortgageBlocks({ fullMortgageInfo, entriesPerPage, pageNo, setPageNo }) {
+    if (typeof fullMortgageInfo === 'undefined') {
         return <></>
     }
-    console.log(fullMortgageInfo);
-    const {skip, count, total, blocks} = fullMortgageInfo;
+    const { total, blocks} = fullMortgageInfo;
+    let numOfPages = Math.floor(total / entriesPerPage);
+    if (total % entriesPerPage > 0) {
+        ++numOfPages;
+    }
+    let goPrev = () => {
+        if (pageNo > 0) {
+            setPageNo(pageNo - 1);
+        }
+    };
+    let goNext = () => {
+        if (pageNo < numOfPages - 1) {
+            setPageNo(pageNo + 1);
+        }
+    };
     return (
         <>
             <SectionTitle Icon={FaHackerrank} title="Full-mortgage blocks" desc={'Total ' + formatNumberString(total) + ' blocks'} />
+            <div className="flex flex-row items-center">
+                <div className="text-xs m-2">Page {pageNo + 1}/{ numOfPages }</div>
+                <div className="inline-flex m-2">
+                    <button className="border bg-blue-400 text-white p-1 rounded-l m-0 font-bold" onClick={goPrev}>Prev</button>
+                    <button className="border bg-blue-400 text-white p-1 rounded-r m-0 font-bold" onClick={goNext}>Next</button>
+                </div>
+            </div>
             {blocks.map((block, i) => {
                 return (
                     <div className="mb-2" key={i}>
@@ -518,7 +538,7 @@ function FullMortgageBlocks({ fullMortgageInfo }) {
                         <StatusEntry name="Block reward" value={formatNumberString(block.reward/100000000) + "/" + formatNumberString(block.calculatedReward/100000000)} hi={i % 2 === 0} />
                         <StatusEntry name="Block subsidy" value={formatNumberString(block.subsidy/100000000)} hi={i % 2 === 0} />
                         <StatusEntry name="Miner" value={block.miner} hi={i % 2 === 0} />
-                        <StatusEntry name="Distributions" value={block.numOfDistributed + "/" + block.numOfDistributions} hi={i % 2 === 0} strong_value={!block.noMoreDistribution} />
+                        <StatusEntry name="Distributions" value={block.numOfDistributed + "/" + block.numOfDistributions} hi={i % 2 === 0} />
                         <StatusEntry name="Accumulated" value={formatNumberString(block.originalAccumulated/100000000)} hi={i % 2 === 0} />
                         <StatusEntry name="New accumulated" value={formatNumberString(block.actualAccumulated/100000000)} hi={i % 2 === 0} />
                     </div>
@@ -533,18 +553,20 @@ function FullMortgageBlocks({ fullMortgageInfo }) {
  */
 
 export default function Home() {
+    const ENTRIES_PER_PAGE = 10;
     const [baseStatus, queryStatus] = useTimelordStatus();
     const [summary24, querySummary24] = useTimelordSummary(24);
     const [summary24_7, querySummary24_7] = useTimelordSummary(24 * 7);
     const [netspace, queryNetspace] = useTimelordNetspace(24 * 7);
     const [fullMortgageInfo, queryFullMortgageInfo] = useAccumulatedBlocks();
+    const [pageNo, setPageNo] = useState(0);
     useEffect(() => {
         queryStatus();
         querySummary24();
         querySummary24_7();
         queryNetspace();
-        queryFullMortgageInfo();
-    }, []);
+        queryFullMortgageInfo(pageNo * ENTRIES_PER_PAGE, ENTRIES_PER_PAGE);
+    }, [pageNo]);
     return (
         <main className="flex flex-col items-center text-sm">
             <div className="w-full bg-gray-100 lg:w-[1000px] lg:bg-white dark:bg-gray-900 dark:lg:bg-gray-900">
@@ -562,7 +584,7 @@ export default function Home() {
                     </div>
                     <div className="lg:bg-gray-50 dark:lg:bg-gray-700 lg:rounded-2xl">
                         <div className="mt-4 lg:p-8">
-                            <FullMortgageBlocks fullMortgageInfo={fullMortgageInfo} />
+                            <FullMortgageBlocks entriesPerPage={ENTRIES_PER_PAGE} fullMortgageInfo={fullMortgageInfo} pageNo={pageNo} setPageNo={setPageNo} />
                         </div>
                     </div>
                 </div>
