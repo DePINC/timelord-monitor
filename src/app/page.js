@@ -15,7 +15,7 @@ function getApiHost() {
     if (process.env.NODE_ENV === 'production') {
         return process.env.NEXT_PUBLIC_API_URL;
     }
-    return 'http://localhost:39393';
+    return 'https://timelord.depinc.org/testnet3';
 }
 
 function replaceUndefined(v) {
@@ -133,6 +133,16 @@ function useRank(hours) {
         });
     };
     return [rank, query];
+}
+
+function useAccumulatedBlocks() {
+    const [fullMortgageInfo, setFullMortgageInfo] = useState();
+    const queryFullMortgageInfo = () => {
+        axios.get(getApiHost() + '/api/accumulated').then(function (res) {
+            setFullMortgageInfo(res.data);
+        });
+    };
+    return [fullMortgageInfo, queryFullMortgageInfo];
 }
 
 /**
@@ -492,23 +502,25 @@ function Summary({ num_blocks, high_height, low_height, hours, summary, avg_dura
     );
 }
 
-function Rank({ rank, title }) {
-    let begin_height;
-    let entries = [];
-    if (rank) {
-        begin_height = rank.begin_height;
-        entries = rank.entries;
+function FullMortgageBlocks({ fullMortgageInfo }) {
+    if (!fullMortgageInfo) {
+        return <></>
     }
+    console.log(fullMortgageInfo);
+    const {skip, count, total, blocks} = fullMortgageInfo;
     return (
         <>
-            <SectionTitle Icon={FaHackerrank} title={title} desc={'Since height ' + formatNumberString(begin_height)} />
-            {entries.map((entry, i) => {
+            <SectionTitle Icon={FaHackerrank} title="Full-mortgage blocks" desc={'Total ' + formatNumberString(total) + ' blocks'} />
+            {blocks.map((block, i) => {
                 return (
-                    <div className="mb-2">
-                        <StatusEntry name="Farmer public-key" strong_value value={entry.farmer_pk} hi={i % 2 === 0} />
-                        <StatusEntry name="Produced blocks" value={formatNumberString(entry.count)} hi={i % 2 === 0} />
-                        <StatusEntry name="Avg. Block Difficulty" value={formatNumberString(entry.average_difficulty)} hi={i % 2 === 0} />
-                        <StatusEntry name="Rewards" value={formatNumberString(entry.total_reward / 100000000) + ' DEPC'} hi={i % 2 === 0} />
+                    <div className="mb-2" key={i}>
+                        <StatusEntry name="Height" value={formatNumberString(block.height)} hi={i % 2 === 0} />
+                        <StatusEntry name="Block reward" value={formatNumberString(block.reward/100000000) + "/" + formatNumberString(block.calculatedReward/100000000)} hi={i % 2 === 0} />
+                        <StatusEntry name="Block subsidy" value={formatNumberString(block.subsidy/100000000)} hi={i % 2 === 0} />
+                        <StatusEntry name="Miner" value={block.miner} hi={i % 2 === 0} />
+                        <StatusEntry name="Distributions" value={block.numOfDistributed + "/" + block.numOfDistributions} hi={i % 2 === 0} strong_value={!block.noMoreDistribution} />
+                        <StatusEntry name="Accumulated" value={formatNumberString(block.originalAccumulated/100000000)} hi={i % 2 === 0} />
+                        <StatusEntry name="New accumulated" value={formatNumberString(block.actualAccumulated/100000000)} hi={i % 2 === 0} />
                     </div>
                 );
             })}
@@ -525,15 +537,13 @@ export default function Home() {
     const [summary24, querySummary24] = useTimelordSummary(24);
     const [summary24_7, querySummary24_7] = useTimelordSummary(24 * 7);
     const [netspace, queryNetspace] = useTimelordNetspace(24 * 7);
-    const [rank, queryRank] = useRank();
-    const [rank24, queryRank24] = useRank(24);
+    const [fullMortgageInfo, queryFullMortgageInfo] = useAccumulatedBlocks();
     useEffect(() => {
         queryStatus();
         querySummary24();
         querySummary24_7();
         queryNetspace();
-        queryRank();
-        queryRank24();
+        queryFullMortgageInfo();
     }, []);
     return (
         <main className="flex flex-col items-center text-sm">
@@ -552,10 +562,7 @@ export default function Home() {
                     </div>
                     <div className="lg:bg-gray-50 dark:lg:bg-gray-700 lg:rounded-2xl">
                         <div className="mt-4 lg:p-8">
-                            <Rank title="Rank" rank={rank} />
-                        </div>
-                        <div className="my-4 lg:p-8">
-                            <Rank title="Rank in 24 hours" rank={rank24} />
+                            <FullMortgageBlocks fullMortgageInfo={fullMortgageInfo} />
                         </div>
                     </div>
                 </div>
