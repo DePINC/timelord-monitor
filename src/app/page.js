@@ -7,6 +7,8 @@ import { FaBitcoin, FaLandmark, FaChartPie, FaStream, FaRocket, FaClock, FaHdd, 
 import 'chart.js/auto';
 import { Pie, Line } from 'react-chartjs-2';
 
+const COIN = 100000000;
+
 /**
  * Utilities
  */
@@ -535,12 +537,12 @@ function FullMortgageBlocks({ fullMortgageInfo, entriesPerPage, pageNo, setPageN
                 return (
                     <div className="mb-2" key={i}>
                         <StatusEntry name="Height" value={formatNumberString(block.height)} hi={i % 2 === 0} />
-                        <StatusEntry name="Block reward" value={formatNumberString(block.reward/100000000) + "/" + formatNumberString(block.calculatedReward/100000000)} hi={i % 2 === 0} />
-                        <StatusEntry name="Block subsidy" value={formatNumberString(block.subsidy/100000000)} hi={i % 2 === 0} />
+                        <StatusEntry name="Block reward" value={formatNumberString(block.reward/COIN) + "/" + formatNumberString(block.calculatedReward/COIN)} hi={i % 2 === 0} />
+                        <StatusEntry name="Block subsidy" value={formatNumberString(block.subsidy/COIN)} hi={i % 2 === 0} />
                         <StatusEntry name="Miner" value={block.miner} hi={i % 2 === 0} />
                         <StatusEntry name="Distributions" value={block.numOfDistributed + "/" + block.numOfDistributions} hi={i % 2 === 0} />
-                        <StatusEntry name="Accumulated" value={formatNumberString(block.originalAccumulated/100000000)} hi={i % 2 === 0} />
-                        <StatusEntry name="New accumulated" value={formatNumberString(block.actualAccumulated/100000000)} hi={i % 2 === 0} />
+                        <StatusEntry name="Accumulated" value={formatNumberString(block.originalAccumulated/COIN)} hi={i % 2 === 0} />
+                        <StatusEntry name="New accumulated" value={formatNumberString(block.actualAccumulated/COIN)} hi={i % 2 === 0} />
                     </div>
                 );
             })}
