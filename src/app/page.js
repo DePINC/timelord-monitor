@@ -337,6 +337,44 @@ function Status({ challenge, height, iters_per_sec, total_size, max_size, min_si
     );
 }
 
+function HorzLine() {
+    return (<div className="border-t border-gray-300 h-1 w-full"></div>);
+}
+
+function AccumulateInfoEntry({name, value}) {
+    return (
+        <div>
+            {name}{value}
+        </div>
+    );
+}
+
+function AccumulateInfo({ subsidy, originalAccumulated, numOfDistributions, actualAccumulated, contributedFromBlocks }) {
+    let sum = 0.0;
+    for (let i = 0; i < contributedFromBlocks.length; ++i) {
+        sum += contributedFromBlocks[i].amount;
+    }
+    return (
+        <>
+            <div className="flex flex-col items-start p-2">
+                <AccumulateInfoEntry name="区块累积奖励（老版本）：" value={formatNumberString(originalAccumulated/COIN)} />
+                <AccumulateInfoEntry name="本区块累积奖励分发次数：" value={numOfDistributions} />
+                <AccumulateInfoEntry name="区块累积奖励（新版本）：" value={ "前置区块累积奖励 (" + formatNumberString(sum/COIN) + ") + 本区块累积奖励 (" + formatNumberString(originalAccumulated/COIN) + "/" + numOfDistributions + ") = " + formatNumberString(actualAccumulated/COIN)} />
+                <AccumulateInfoEntry name="全质押区块奖励计算公式：" value={"当前区块完整的奖励 (" + formatNumberString(subsidy/COIN) + ") + 前置区块累积奖励 (" + formatNumberString(sum/COIN) + ") + 本区块累积奖励 (" + formatNumberString(originalAccumulated/numOfDistributions/COIN) + ") = 总奖励 (" + formatNumberString((subsidy + sum + originalAccumulated/numOfDistributions)/COIN) + ")"} />
+                <AccumulateInfoEntry name="相关前置区块数量：" value={contributedFromBlocks.length + "，前置区块累积奖励 (" + formatNumberString(sum/COIN) + ")"} />
+                <div className="break-words">
+                    {contributedFromBlocks.map((block) => {
+                        return (
+                            block.height + "(" + formatNumberString(block.amount/COIN) + ") "
+                        );
+                    })}
+                </div>
+            </div>
+            <HorzLine />
+        </>
+    );
+}
+
 /**
  * Summary
  */
@@ -526,7 +564,7 @@ function FullMortgageBlocks({ fullMortgageInfo, entriesPerPage, pageNo, setPageN
     return (
         <>
             <SectionTitle Icon={FaHackerrank} title="Full-mortgage blocks" desc={'Total ' + formatNumberString(total) + ' blocks'} />
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-center align-bottom pb-4">
                 <div className="text-xs m-2">Page {pageNo + 1}/{ numOfPages }</div>
                 <div className="inline-flex m-2">
                     <button className="border bg-blue-400 text-white p-1 rounded-l m-0 font-bold" onClick={goPrev}>Prev</button>
@@ -537,12 +575,13 @@ function FullMortgageBlocks({ fullMortgageInfo, entriesPerPage, pageNo, setPageN
                 return (
                     <div className="mb-2" key={i}>
                         <StatusEntry name="Height" value={formatNumberString(block.height)} hi={i % 2 === 0} />
-                        <StatusEntry name="Block reward" value={formatNumberString(block.reward/COIN) + "/" + formatNumberString(block.calculatedReward/COIN)} hi={i % 2 === 0} />
+                        <StatusEntry name="Block reward" value={formatNumberString(block.reward/COIN)} hi={i % 2 === 0} />
                         <StatusEntry name="Block subsidy" value={formatNumberString(block.subsidy/COIN)} hi={i % 2 === 0} />
                         <StatusEntry name="Miner" value={block.miner} hi={i % 2 === 0} />
                         <StatusEntry name="Distributions" value={block.numOfDistributed + "/" + block.numOfDistributions} hi={i % 2 === 0} />
                         <StatusEntry name="Accumulated" value={formatNumberString(block.originalAccumulated/COIN)} hi={i % 2 === 0} />
                         <StatusEntry name="New accumulated" value={formatNumberString(block.actualAccumulated/COIN)} hi={i % 2 === 0} />
+                        <AccumulateInfo numOfDistributions={block.numOfDistributions} subsidy={block.subsidy} originalAccumulated={block.originalAccumulated} actualAccumulated={block.actualAccumulated} contributedFromBlocks={block.contributedFromBlocks} />
                     </div>
                 );
             })}
