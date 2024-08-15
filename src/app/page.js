@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { FaBitcoin, FaLandmark, FaChartPie, FaStream, FaRocket, FaClock, FaHdd, FaHackerrank, FaHubspot, FaCubes } from 'react-icons/fa';
+import { FaBitcoin, FaLandmark, FaChartPie, FaStream, FaRocket, FaClock, FaHdd, FaHackerrank, FaHubspot, FaCubes, FaMugHot } from 'react-icons/fa';
 
 import 'chart.js/auto';
 import { Pie, Line } from 'react-chartjs-2';
@@ -285,6 +285,16 @@ function StatusArriving({ height, challenge, total_size, max_size, estimated_net
     );
 }
 
+function StatusProfitDetails({ days, profitFullmortgagePerPBHuman }) {
+    return (
+        <>
+            <SectionTitle Icon={FaMugHot} title="Profit" />
+            <StatusEntry name="Full mortgage profit / PB" value={`${profitFullmortgagePerPBHuman} DePC`} />
+            <StatusEntry name="Statistical duration" value={`${days} days`} />
+        </>
+    )
+}
+
 function StatusPledgeInfo({ retarget_min_heights, pledges }) {
     const noterm = pledges ? pledges[0] : { lock_height: 0, actual_percent: 0 };
     const term1 = pledges ? pledges[1] : { lock_height: 0, actual_percent: 0 };
@@ -345,13 +355,14 @@ function StatusSupply({ dist_height, calc, last }) {
     );
 }
 
-function Status({ challenge, height, iters_per_sec, total_size, max_size, min_size, difficulty, num_connections, status_string, last_block_info, vdf_pack, supply, pledge_info, estimated_netspace, fork_height }) {
+function Status({ challenge, height, iters_per_sec, total_size, max_size, min_size, difficulty, num_connections, status_string, last_block_info, vdf_pack, supply, pledge_info, estimated_netspace, fork_height, profit_fullmortgage }) {
     return (
         <>
             <div className="lg:w-[430px]">
                 <StatusBase iters_per_sec={iters_per_sec} num_connections={num_connections} status_string={status_string} max_size={max_size} min_size={min_size} fork_height={fork_height} />
                 <StatusArriving height={height} challenge={challenge} total_size={total_size} max_size={max_size} vdf_pack={vdf_pack} num_connections={num_connections} difficulty={difficulty} estimated_netspace={estimated_netspace} />
                 <StatusPledgeInfo {...pledge_info} />
+                <StatusProfitDetails {...profit_fullmortgage} />
             </div>
             <div className="lg:w-[430px]">
                 <StatusLastBlockInfo {...last_block_info} />
